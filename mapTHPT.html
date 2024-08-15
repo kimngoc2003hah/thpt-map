@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Map THPT</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.9.2/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.9.2/mapbox-gl.css' rel='stylesheet' />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        .mapboxgl-marker i {
+            font-size: 24px;
+            color: #4983aa;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1Ijoia2ltbmdvY25lIiwiYSI6ImNsenRnNTBkNDJpcW4yanBsdTR3cnFkbGcifQ.aIpZK0bu_25t0vvQ2Dl2LQ';
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v11',
+            center: [105.8, 21.03],
+            zoom: 6
+        });
+
+        map.on('load', function () {
+            fetch('thpt.geojson')
+                .then(response => response.json())
+                .then(data => {
+                    data.features.forEach(function(marker) {
+                        var el = document.createElement('div');
+                        el.className = 'marker';
+                        el.innerHTML = '<i class="fa-solid fa-location-dot"></i>';
+
+                        var popupContent = `
+                            <h3>Tên: ${marker.properties.HoTen}</h3>
+                            <p>Địa chỉ: ${marker.properties.Address }</p>
+                            <p>Số điện thoại: ${marker.properties.DienThoai}</p>
+                            <p>Email: ${marker.properties.EmailLienLac}</p>
+                            <p>Tên trường: ${marker.properties.TenTruongDH}</p>
+                            <p>Tên ngành: ${marker.properties.TenNganh}</p>
+                        `;
+                        
+                        new mapboxgl.Marker(el)
+                            .setLngLat(marker.geometry.coordinates)
+                            .setPopup(new mapboxgl.Popup({ offset: 25 }) 
+                                .setHTML(popupContent))
+                            .addTo(map);
+                    });
+                });
+        });
+    </script>
+</body>
+</html>
